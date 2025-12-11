@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Bloxel - Dashboard</title>
+<style>
+:root {
+    --morado: #6A4FCE;
+    --morado-claro: #9B86FF;
+    --verde: #38D39F;
+    --fondo: #F7F7FA;
+    --texto: #2D2D2D;
+    --naranja: #ff8c00;
+}
+
+/* ===================== GENERAL ===================== */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--fondo);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+h1,h2,h3 { margin: 0; }
+button { cursor: pointer; }
+
+/* ===================== HEADER ===================== */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: var(--morado);
+    color: white;
+}
+header img.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+header .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+header button {
+    background: var(--naranja);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+}
+header button:hover { opacity: 0.9; }
+
+/* ===================== DASHBOARD ===================== */
+#dashboard { padding: 20px; flex: 1; }
+.stats { display: flex; gap: 20px; margin-bottom: 30px; }
+.stat-box {
+    background: white; padding: 20px; border-radius: 15px;
+    width: 160px; text-align: center; box-shadow: 0 0 6px #ddd;
+}
+
+/* ===================== CURSOS ===================== */
+.courses { display: flex; gap: 20px; flex-wrap: wrap; }
+.course-card {
+    width: 260px; background: white; padding: 20px;
+    border-radius: 15px; box-shadow: 0 0 6px #ddd;
+}
+.progress-bar { background: #ddd; border-radius: 5px; height: 8px; margin-top: 10px; }
+.progress { background: var(--verde); height: 8px; border-radius: 5px; }
+
+/* ===================== LECCIONES ===================== */
+#lessonView { display: none; padding: 20px; }
+.lesson-btn {
+    margin-top: 10px; padding: 10px; width: 100%;
+    border-radius: 8px; border: none; background: var(--morado-claro); color: white;
+}
+
+/* ===================== TEST ===================== */
+#quizView { display: none; padding: 20px; }
+.option {
+    background: white; padding: 15px; border-radius: 10px;
+    margin-top: 10px; box-shadow: 0 0 5px #ccc;
+    cursor: pointer;
+}
+.option:hover { background: var(--morado-claro); color: white; }
+
+/* ===================== LOGROS ===================== */
+#logros { display: none; padding: 20px; }
+.logro-card {
+    background: #fff7e6; 
+    border-left: 8px solid var(--naranja);
+    padding: 20px; border-radius: 12px;
+    margin-bottom: 20px; width: 350px;
+    box-shadow: 0 0 8px #ffd9a0;
+    display: flex; gap: 20px; align-items: center;
+}
+.logro-card span { font-size: 40px; color: var(--naranja); }
+
+/* ===================== FOOTER ===================== */
+footer {
+    background: var(--morado); 
+    color: white; 
+    text-align: center; 
+    padding: 15px 10px;
+    font-size: 14px;
+}
+footer a {
+    color: var(--verde); 
+    text-decoration: none; 
+    font-weight: bold;
+}
+footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="user-info">
+        <span id="userName">Estudiante</span>
+        <img src="logo.jpg" class="avatar" alt="Avatar">
+    </div>
+    <button onclick="logout()">Cerrar sesión</button>
+</header>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+    <h1>Hola, <span id="userName2">Estudiante</span> 👋</h1>
+
+    <div class="stats">
+        <div class="stat-box"><h3>Puntos</h3><span id="points">0</span></div>
+        <div class="stat-box"><h3>Lecciones</h3><span id="lessons">0</span></div>
+        <div class="stat-box"><h3>Racha</h3><span id="streak">0</span></div>
+    </div>
+
+    <h2>Cursos Disponibles</h2>
+    <div id="courseList" class="courses"></div>
+
+    <button onclick="showLogros()" style="margin-top:20px;background:var(--naranja);">
+        Ver Logros 🏆
+    </button>
+</div>
+
+<!-- LECCIONES -->
+<div id="lessonView">
+    <h2 id="lessonTitle"></h2>
+    <p id="lessonContent"></p>
+    <button id="nextLessonBtn" class="lesson-btn">Siguiente</button>
+</div>
+
+<!-- TEST -->
+<div id="quizView">
+    <h2>Desafío de Fórmulas</h2>
+    <h3 id="quizQuestion"></h3>
+    <div id="quizOptions"></div>
+    <p id="quizStatus"></p>
+</div>
+
+<!-- LOGROS -->
+<div id="logros">
+    <h1>Logros del Estudiante 🏆</h1>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    &copy; 2025 Bloxel. Todos los derechos reservados. <a href="#">Política de privacidad</a>
+</footer>
+
+<script>
+// ======= DATOS DEL USUARIO Y CURSOS SIMULADOS =======
+let user = {name: "Estudiante", points: 50, lessonsCompleted: 0, streak: 3};
+
+let courses = [
+    {
+        id: 1,
+        title: "Excel Básico",
+        lessons: ["Introducción a Excel","Trabajando con celdas","Fórmulas simples","Desafío de fórmulas"],
+        progress: 0
+    },
+    {
+        id: 2,
+        title: "Excel Intermedio",
+        lessons: ["Tablas dinámicas","Funciones condicionales","Gráficos","Desafío final"],
+        progress: 0
+    }
+];
+
+// ======= DASHBOARD =======
+function loadDashboard() {
+    document.getElementById("userName").innerText = user.name;
+    document.getElementById("userName2").innerText = user.name;
+    document.getElementById("points").innerText = user.points;
+    document.getElementById("lessons").innerText = user.lessonsCompleted;
+    document.getElementById("streak").innerText = user.streak;
+
+    let html = "";
+    courses.forEach(c => {
+        html += `
+            <div class="course-card">
+                <h3>${c.title}</h3>
+                <p>${c.lessons.length} lecciones</p>
+                <div class="progress-bar"><div class="progress" style="width:${c.progress}%"></div></div>
+                <button onclick="openLesson(${c.id})">Ingresar</button>
+            </div>
+        `;
+    });
+    document.getElementById("courseList").innerHTML = html;
+}
+
+// ======= LECCIONES =======
+let currentCourse = null;
+let currentLessonIndex = 0;
+
+function openLesson(courseId) {
+    currentCourse = courses.find(c => c.id===courseId);
+    currentLessonIndex = 0;
+    document.getElementById("dashboard").style.display="none";
+    document.getElementById("lessonView").style.display="block";
+    loadLesson();
+}
+
+function loadLesson() {
+    let lesson = currentCourse.lessons[currentLessonIndex];
+    document.getElementById("lessonTitle").innerText = lesson;
+    if(lesson==="Desafío de fórmulas"){ startQuiz(); return; }
+    document.getElementById("lessonContent").innerHTML = "<p>Contenido de la lección: <b>"+lesson+"</b></p>";
+    document.getElementById("nextLessonBtn").onclick = nextLesson;
+}
+
+function nextLesson() {
+    user.lessonsCompleted++;
+    currentLessonIndex++;
+    if(currentLessonIndex>=currentCourse.lessons.length){
+        currentCourse.progress=100;
+        backToDashboard();
+        return;
+    }
+    currentCourse.progress = (currentLessonIndex/currentCourse.lessons.length)*100;
+    loadLesson();
+}
+
+// ======= QUIZ =======
+let quizQuestions = [
+    {q:"¿Qué fórmula suma un rango?", options:["=PROMEDIO(A1:A5)","=SUMA(A1:A5)","=SI(A1>3)","=BUSCARV"], correct:1},
+    {q:"¿Qué función calcula un promedio?", options:["=SUMA","=PROMEDIO","=MAX","=MIN"], correct:1},
+    {q:"¿Cuál función busca valores?", options:["=BUSCARV","=CONTAR","=REDONDEAR","=HOY"], correct:0},
+    {q:"Fórmula correcta para sumar 5 + 2:", options:["=5+2","5+2","=SUMA(5*2)","=RESTA(5+2)"], correct:0},
+];
+let quizIndex=0, quizScore=0;
+
+function startQuiz(){
+    document.getElementById("lessonView").style.display="none";
+    document.getElementById("quizView").style.display="block";
+    showQuizQuestion();
+}
+
+function showQuizQuestion(){
+    let q=quizQuestions[quizIndex];
+    document.getElementById("quizQuestion").innerText=(quizIndex+1)+". "+q.q;
+    let html="";
+    q.options.forEach((opt,i)=>{ html+=`<div class="option" onclick="selectOption(${i})">${opt}</div>`; });
+    document.getElementById("quizOptions").innerHTML=html;
+}
+
+function selectOption(i){
+    if(i===quizQuestions[quizIndex].correct) quizScore++;
+    quizIndex++;
+    if(quizIndex>=quizQuestions.length) finishQuiz();
+    else showQuizQuestion();
+}
+
+function finishQuiz(){
+    let percent=Math.round((quizScore/quizQuestions.length)*100);
+    user.points+=percent;
+    document.getElementById("quizView").innerHTML=`
+        <h2>Tu resultado</h2>
+        <h1>${percent}%</h1>
+        <button onclick="backToDashboard()" style="background:var(--morado); color:white;">Volver</button>
+    `;
+}
+
+// ======= LOGROS =======
+function showLogros(){
+    document.getElementById("dashboard").style.display="none";
+    document.getElementById("logros").style.display="block";
+    // Crear logros dinámicos
+    const logrosDiv = document.getElementById("logros");
+    logrosDiv.innerHTML = `<h1>Logros del Estudiante 🏆</h1>`;
+    const achievements = [
+        {name:"Platino", desc:"Completa todos los cursos"},
+        {name:"Oro I", desc:"Llega a 300 puntos"},
+        {name:"Oro II", desc:"Completa 8 lecciones"},
+        {name:"Oro III", desc:"Racha de 10 días"},
+        {name:"Plata I", desc:"Primera lección completada"},
+        {name:"Plata II", desc:"Primer curso completado"},
+        {name:"Bronce I", desc:"Te registraste correctamente"},
+        {name:"Bronce II", desc:"Visitaste el catálogo de cursos"}
+    ];
+    achievements.forEach(a=>{
+        let card = document.createElement("div");
+        card.className="logro-card";
+        card.innerHTML=`<span>👑</span><div><b>${a.name}</b><br>${a.desc}</div>`;
+        logrosDiv.appendChild(card);
+    });
+    logrosDiv.innerHTML += `<button onclick="backToDashboard()" style="background:var(--morado); color:white; margin-top:20px;">Volver al inicio</button>`;
+}
+
+// ======= FUNCIONES AUXILIARES =======
+function backToDashboard(){
+    document.getElementById("dashboard").style.display="block";
+    document.getElementById("lessonView").style.display="none";
+    document.getElementById("quizView").style.display="none";
+    document.getElementById("logros").style.display="none";
+    loadDashboard();
+}
+
+function logout(){
+    alert("Cerrando sesión...");
+    // Redirigir al login
+    window.location.href="login.html";
+}
+
+// Inicializar
+loadDashboard();
+</script>
+
+</body>
+</html>

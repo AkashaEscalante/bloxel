@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Bloxel - Login</title>
+<style>
+/* ===================== COLORES ===================== */
+:root {
+    --morado: #6A4FCE;
+    --morado-claro: #9B86FF;
+    --verde: #38D39F;
+    --fondo: #F7F7FA;
+    --texto: #2D2D2D;
+}
+
+/* ===================== GENERAL ===================== */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--fondo);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ===================== LOGIN ===================== */
+#login {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.login-card {
+    background: white; 
+    padding: 40px; 
+    width: 360px;
+    border-radius: 20px; 
+    box-shadow: 0 0 20px rgba(106,79,206,0.2);
+    text-align: center;
+}
+.login-card img.logo {
+    width: 100px; 
+    height: 100px; 
+    border-radius: 50%; 
+    margin-bottom: 20px;
+}
+.login-card input {
+    width: 100%; 
+    padding: 12px; 
+    margin-top: 12px; 
+    border-radius: 10px; 
+    border: 1px solid #ddd;
+}
+.login-card button {
+    width: 100%; 
+    padding: 12px; 
+    margin-top: 20px; 
+    border: none;
+    border-radius: 10px; 
+    background: var(--morado); 
+    color: white; 
+    font-weight: bold;
+}
+.login-card button:hover {
+    opacity: 0.9;
+}
+
+/* ===================== FOOTER ===================== */
+footer {
+    background: var(--morado); 
+    color: white; 
+    text-align: center; 
+    padding: 15px 10px;
+    font-size: 14px;
+}
+footer a {
+    color: var(--verde); 
+    text-decoration: none; 
+    font-weight: bold;
+}
+footer a:hover {
+    text-decoration: underline;
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+    <div class="login-card">
+        <img src="logo.jpg" class="logo" alt="Logo Bloxel">
+        <h2>Bienvenido a Bloxel</h2>
+        <input id="nameInput" type="text" placeholder="Tu nombre">
+        <input id="email" type="email" placeholder="Correo">
+        <input id="password" type="password" placeholder="Contraseña">
+        <button onclick="login()">Ingresar</button>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    &copy; 2025 Bloxel. Todos los derechos reservados. <a href="#">Política de privacidad</a>
+</footer>
+
+<script>
+function login() {
+    const name = document.getElementById("nameInput").value.trim();
+    if(!name){ alert("Escribe tu nombre"); return; }
+    // Simular inicio de sesión y redirigir
+    alert("Bienvenido " + name + "! Ahora serás redirigido al dashboard.");
+    // Aquí puedes usar: window.location.href="dashboard.html";
+}
+</script>
+
+</body>
+</html>
